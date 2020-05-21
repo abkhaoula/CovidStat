@@ -1,16 +1,16 @@
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
-import pandas as pd
+import pandas as pd#delete
+import csv
 import numpy as np
 import plotly.graph_objs as go
-import plotly.express as px
 #from dash.dependencies import Input, Output
 
-#data intro
-df = pd.read_csv("assets/patients-maroc.csv")
+#read data
+df = pd.read_csv("assets/patients-maroc.csv") #delete
 
-# too much missing values : print(df.isnull().sum())
+# too much missing values :
 df.drop(["sex","age","country","disease","group","infection_order","exposure_start","exposure_end","infected_by","contact_number"],axis = 1,inplace = True)
 # 2 dead with no deceased_date : print(df[df["state"]=="Deceased"][["state","released_date","deceased_date"]])
 df = df.drop(df[(df["state"]=="Deceased") & (df["deceased_date"].isnull())].index)
@@ -244,33 +244,7 @@ app.layout = html.Div([
             }
         )
     ]),
-    html.Div([
-        dcc.Graph(
-            id = "geo_fig",
-            figure={
-                "data": [trace_isolated_geo,trace_deceased_geo,trace_exit_geo],
-                "layout":{"title":"Map view",
-                          "geo":{"resolution":50,
-                                 "showframe": False,
-                                 "showland" : True,"framewidth": 1000,
-                                 "landcolor" : "rgb(217, 217, 217)",
-                                 "fitbounds": "locations",
-                                 "showcoastlines":True, "coastlinecolor":"White",
-                                 "showcountries": True,"countrycolor": "White"},
-                          "hoverinfo": "text",
-                          }
-            }
-        )
-    ]),
-    html.Div([
-        dcc.Graph(
-            id = "bar_chart",
-            figure ={
-                "data": [trace_isolated,trace_deceased,trace_exit],
-                "layout": {"title": "Bar Chart"}
-            }
-        )
-    ]),
+    html.H3(id = "date_selected"),
     html.Div([
         dcc.Slider(
             id="date_selector",
@@ -280,7 +254,36 @@ app.layout = html.Div([
             value=(df.confirmed_date.max()-df.confirmed_date.min()).days,
         )
     ]),
-    html.H3(id = "date_selected"),
+    html.Div([
+        html.Div([
+            dcc.Graph(
+                id = "geo_fig",
+                figure={
+                    "data": [trace_isolated_geo,trace_deceased_geo,trace_exit_geo],
+                    "layout":{"title":"Map view",
+                              "legend": {'itemsizing': 'constant'},
+                              "geo":{"resolution":50,
+                                     "showframe": False,
+                                     "showland" : True,"framewidth": 1000,
+                                     "landcolor" : "rgb(217, 217, 217)",
+                                     "fitbounds": "locations",
+                                     "showcoastlines":True, "coastlinecolor":"White",
+                                     "showcountries": True,"countrycolor": "White"},
+                              "hoverinfo": "text",
+                              }
+                }
+            )
+        ], className="col-5"),
+        html.Div([
+            dcc.Graph(
+                id = "bar_chart",
+                figure ={
+                    "data": [trace_isolated,trace_deceased,trace_exit],
+                    "layout": {"title": "Bar Chart"}
+                }
+            )
+        ], className="col-7"),
+    ], className="row"),
 ])
 
 #callback to update the day displayed
@@ -389,7 +392,8 @@ def update_geo_fig(value):
         "<extra></extra>",
     )
     return {"data": [trace_isolated_geo,trace_deceased_geo,trace_exit_geo],
-            "layout":{"title":"Was testing",
+            "layout":{"title":"Map view",
+                      "legend": {'itemsizing': 'constant'},
                       "geo":{"resolution":50,
                              "showframe": False,
                              "showland" : True,"framewidth": 1000,
@@ -397,7 +401,8 @@ def update_geo_fig(value):
                              "fitbounds": "locations",
                              "showcoastlines":True, "coastlinecolor":"White",
                              "showcountries": True,"countrycolor": "White"},
-                      "hoverinfo": "text",}}
+                      "hoverinfo": "text",}
+            }
 
 
 
